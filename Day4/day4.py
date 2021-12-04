@@ -69,7 +69,7 @@ def play(
     boards: List[Dict[int, Tuple[int, int]]],
     masks: List[List[List[bool]]],
     part: int,
-):
+) -> int:
     visited = [set() for _ in masks]
     has_won = [False for _ in masks]
 
