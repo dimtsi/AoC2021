@@ -33,9 +33,7 @@ def to_dict(board: List[List[int]]) -> Dict[int, Tuple[int, int]]:
 
 def load_data(
     filename: str,
-) -> Tuple[
-    List[int], List[Dict[int, Tuple[int, int]]], List[List[List[bool]]]
-]:
+) -> Tuple[List[int], List[Dict[int, Tuple[int, int]]], List[List[List[bool]]]]:
     seq, boards = parse(filename)
     board_lookups = [to_dict(board) for board in boards]
     masks = init_masks(boards)
@@ -52,6 +50,7 @@ def check_if_complete(board_mask: List[List[bool]]):
         if all([board_mask[i][j] for i in range(len(board_mask))]):
             return True
     return False
+
 
 def init_masks(boards: List):
     nrows = len(boards[0])
