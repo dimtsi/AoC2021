@@ -59,7 +59,6 @@ def init_masks(boards: List):
     return [deepcopy(mask) for _ in boards]
 
 
-#
 def return_unchecked(board: Dict, visited: Set) -> Set:
     unvisited = set(board.keys()) - visited
     return unvisited
