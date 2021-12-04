@@ -2,40 +2,6 @@ from typing import List, Dict, Tuple, Set
 from copy import deepcopy
 
 
-def to_dict(board: List[List[int]]) -> Dict[int, Tuple[int, int]]:
-    # dict returning indices for quick lookups
-    lookup = {}
-
-    for i in range(len(board)):
-        for j in range(len(board[0])):
-            lookup[board[i][j]] = (i, j)
-
-    return lookup
-
-
-def check_if_complete(board_mask: List[List[bool]]):
-    # check rows
-    for row in board_mask:
-        if all(row):
-            return True
-    # check cols
-    for j in range(len(board_mask[0])):
-        if all([board_mask[i][j] for i in range(len(board_mask))]):
-            return True
-    return False
-
-
-def load_data(
-    filename: str,
-) -> Tuple[
-    List[int], List[Dict[int, Tuple[int, int]]], List[List[List[bool]]]
-]:
-    seq, boards = parse(filename)
-    board_lookups = [to_dict(board) for board in boards]
-    masks = init_masks(boards)
-    return seq, board_lookups, masks
-
-
 def parse(filename: str):
 
     with open(filename, "r") as f:
@@ -51,9 +17,41 @@ def parse(filename: str):
             final_b = [list(map(int, line.split())) for line in board]
             final_boards.append(final_b)
 
-        # final_boards = [list(map(int, line.split())) for board in new_boards for line in board]
         return seq, final_boards
 
+
+def to_dict(board: List[List[int]]) -> Dict[int, Tuple[int, int]]:
+    # dict returning indices for quick lookups
+    lookup = {}
+
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            lookup[board[i][j]] = (i, j)
+
+    return lookup
+
+
+def load_data(
+    filename: str,
+) -> Tuple[
+    List[int], List[Dict[int, Tuple[int, int]]], List[List[List[bool]]]
+]:
+    seq, boards = parse(filename)
+    board_lookups = [to_dict(board) for board in boards]
+    masks = init_masks(boards)
+    return seq, board_lookups, masks
+
+
+def check_if_complete(board_mask: List[List[bool]]):
+    # check rows
+    for row in board_mask:
+        if all(row):
+            return True
+    # check cols
+    for j in range(len(board_mask[0])):
+        if all([board_mask[i][j] for i in range(len(board_mask))]):
+            return True
+    return False
 
 def init_masks(boards: List):
     nrows = len(boards[0])
