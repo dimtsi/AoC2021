@@ -53,9 +53,9 @@ def check_if_complete(board_mask: List[List[bool]]):
 
 
 def init_masks(boards: List):
-    nrows = len(boards[0])
-    ncols = len(boards[0][0])
-    mask = [ncols * [False] for _ in range(nrows)]
+    n_rows = len(boards[0])
+    n_cols = len(boards[0][0])
+    mask = [n_cols * [False] for _ in range(n_rows)]
     return [deepcopy(mask) for _ in boards]
 
 
