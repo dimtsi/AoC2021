@@ -14,7 +14,9 @@ def parse(filename: str):
     return inp
 
 
-def get_line_points(x1, y1, x2, y2, diagonal=False) -> Generator[Tuple[int, int]]:
+def get_line_points(
+    x1, y1, x2, y2, diagonal=False
+) -> Generator[Tuple[int, int], None, None]:
     original = (x1, y1, x2, y2)
     if x1 == x2:
         if y2 >= y1:
@@ -49,7 +51,6 @@ def get_line_points(x1, y1, x2, y2, diagonal=False) -> Generator[Tuple[int, int]
             while x1 + dx < x2:
                 x = x1 + dx
                 y = y1 + dy
-                # print(x, y, original)
                 yield x, y
                 dx += 1
                 dy = dy - 1 if slope < 0 else dy + 1
@@ -58,7 +59,7 @@ def get_line_points(x1, y1, x2, y2, diagonal=False) -> Generator[Tuple[int, int]
 def formulate_grid(
     lines: List[int], diagonal=False
 ) -> Dict[Tuple[int, int], int]:
-    grid = defaultdict(lambda: 0)
+    grid: Dict = defaultdict(lambda: 0)
     for line in lines:
         gen: Generator = get_line_points(*line, diagonal)
         for point in gen:
@@ -82,9 +83,9 @@ if __name__ == "__main__":
 
     grid = formulate_grid(lines)
     total = count_above_two(grid)
-
     print(f"p1: {total}")
     print()
+    # p2
     grid = formulate_grid(lines, diagonal=True)
     total2 = count_above_two(grid)
     print(f"p2: {total2}")
