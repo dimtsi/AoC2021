@@ -14,7 +14,6 @@ def parse(filename: str) -> List[int]:
     return fish
 
 
-@timing_val
 def simulate(fish: List[int], days: int) -> int:
     day = 0
     while day < days:
@@ -26,19 +25,21 @@ def simulate(fish: List[int], days: int) -> int:
     return sum(fish)
 
 
+
 if __name__ == "__main__":
 
+    from time import time
+    start = time()
     sample = "sample.txt"
     input = "input.txt"
 
     inp = input
 
     fish = parse(inp)
-    total = simulate(fish, days=80)
-    print(f"p1: {total}")
-    print()
+    total_1 = simulate(fish[:], days=80)
     # # p2
-    fish = parse(inp)
-    total = simulate(fish, days=256)
-    print(f"p2: {total}")
+    total_2 = simulate(fish[:], days=256)
+    end = time()
+    print(end - start)
+    print(f"p1: {total_1}\np2: {total_2}")
 
