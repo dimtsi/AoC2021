@@ -33,7 +33,9 @@ def to_dict(board: List[List[int]]) -> Dict[int, Tuple[int, int]]:
 
 def load_data(
     filename: str,
-) -> Tuple[List[int], List[Dict[int, Tuple[int, int]]], List[List[List[bool]]]]:
+) -> Tuple[
+    List[int], List[Dict[int, Tuple[int, int]]], List[List[List[bool]]]
+]:
     seq, boards = parse(filename)
     board_lookups = [to_dict(board) for board in boards]
     masks = init_masks(boards)
@@ -106,7 +108,6 @@ if __name__ == "__main__":
     seq, board_lookups, masks = load_data(inp)
     score = play(seq, board_lookups, masks, 1)
     print(f"p1: {score}")
-    print()
     seq, board_lookups, masks = load_data(inp)
     score = play(seq, board_lookups, masks, 2)
     print(f"p2: {score}")

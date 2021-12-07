@@ -23,7 +23,9 @@ def count_zeros_ones(l: List[str]) -> Tuple[List[int], List[int]]:
     return zeros, ones
 
 
-def calculate_gamma_epsilon(zero_totals: List[int], one_totals: List[int]) -> int:
+def calculate_gamma_epsilon(
+    zero_totals: List[int], one_totals: List[int]
+) -> int:
     gamma = ""
     epsilon = ""
     for zero_cnt, one_cnt in zip(zero_totals, one_totals):
