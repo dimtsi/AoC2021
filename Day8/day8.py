@@ -25,6 +25,8 @@ ORIGINAL_SEGMENTS = {
     9: "abcdfg",
 }
 
+CORPUS = set("abcdefg")
+
 ORIGINAL_SETS = {k: set(v) for k, v in ORIGINAL_SEGMENTS.items()}
 ORIGINAL_STR_TO_NUMS = {
     "".join(sorted(v)): k for k, v in ORIGINAL_SETS.items()
@@ -86,10 +88,13 @@ def find_pair_mapping(digits_reprs: Iterable[str]):
 
 
 def eliminate(pair_map: DefaultDict[Tuple[int, int], Set[str]]):
+    from copy import deepcopy
+    original = deepcopy(pair_map)
+
     eliminated: Set[str] = set()
     eliminated_tuples = set()
     map_pair_to_char = {}
-    while len(eliminated) < 6:
+    while len(eliminated) < len(CORPUS) - 1:
         for k, v in pair_map.items():
             if not v or k in eliminated_tuples:
                 continue
@@ -117,8 +122,8 @@ def get_final_mapping(
         val_new = pair_mapping_new[key]
 
         new_map[val_new] = val_orig
-    missing_old = (set("abcdefg") - set(new_map.values())).pop()
-    missing_new = (set("abcdefg") - set(new_map.keys())).pop()
+    missing_old = (CORPUS - set(new_map.values())).pop()
+    missing_new = (CORPUS - set(new_map.keys())).pop()
     new_map[missing_new] = missing_old
     return new_map
 
