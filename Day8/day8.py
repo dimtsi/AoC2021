@@ -65,25 +65,28 @@ def count_unique(outputs):
 def find_pair_mapping(digits_reprs: Iterable[str]):
     """
     This function will match pairs of lengths of
-    representations and their differnces in terms of characters.
-    Initially there might be multiple possible values for 1 char difference.
-    e.g (6, 7) -> {"a", "b"} if there are two different sets of length 6 and 7
-    respectively that have a value one.
+    representations and their differences in terms of characters.
+    The calculation is based on setA - setB, meaning it can yield a difference 1
+    even if the two strings have more than 1 different character.
+    e.g (2, 5) -> {"a"} if there are two different sets of length 6 and 7
+    respectively that have a value one. It is also possible in the case of
+    elements of the same length to yield the same 1 difference result. Then they
+    are appended to the set and will be eliminated in the next step.
 
     In the end we will take the created pairs and corresponding
     potential one char differences and eliminate one by one
-    until each pair can have a difference of a single character
+    until each resulting pair can have a difference of a single character.
+    These sets will be UNIQUE.
 
     """
     pair_map: DefaultDict[Tuple[int, int], Set[str]] = defaultdict(set)
-    for str1 in digits_reprs:
-        for str2 in digits_reprs:
+    for str1 in sorted(digits_reprs, key=len, reverse=True):
+        for str2 in sorted(digits_reprs, key=len, reverse=True):
+            if len(str1) - len(str2) > 1:
+                break
             diff = set(str1) - set(str2)
             if len(diff) == 1:
-                sorted_tup: Tuple[int, int] = tuple( # type: ignore
-                    sorted([len(str1), len(str2)])
-                )  # sort key tuple to avoid mismatch with originals later
-                pair_map[sorted_tup].add(list(diff)[0])  # type: ignore
+                pair_map[(len(str1), len(str2))].add(list(diff)[0])  # type: ignore
     return eliminate(pair_map)
 
 
