@@ -94,9 +94,7 @@ def find_pair_mapping(
 def eliminate(
     pair_map: DefaultDict[Tuple[int, int], Set[str]]
 ) -> Dict[Tuple[int, int], str]:
-    from copy import deepcopy
 
-    original_map = deepcopy(pair_map)
     eliminated: Set[str] = set()
     eliminated_tuples = set()
     map_pair_to_char = {}
