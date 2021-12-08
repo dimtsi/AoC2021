@@ -82,11 +82,11 @@ def find_pair_mapping(digits_reprs: Iterable[str]):
     pair_map: DefaultDict[Tuple[int, int], Set[str]] = defaultdict(set)
     for str1 in sorted(digits_reprs, key=len, reverse=True):
         for str2 in sorted(digits_reprs, key=len, reverse=True):
-            if len(str1) - len(str2) > 1:
-                break
             diff = set(str1) - set(str2)
             if len(diff) == 1:
                 pair_map[(len(str1), len(str2))].add(list(diff)[0])  # type: ignore
+    from pprint import pprint
+    pprint(pair_map)
     return eliminate(pair_map)
 
 
