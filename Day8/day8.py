@@ -88,8 +88,6 @@ def find_pair_mapping(digits_reprs: Iterable[str]):
 
 
 def eliminate(pair_map: DefaultDict[Tuple[int, int], Set[str]]):
-    from copy import deepcopy
-    original = deepcopy(pair_map)
 
     eliminated: Set[str] = set()
     eliminated_tuples = set()
