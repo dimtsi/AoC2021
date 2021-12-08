@@ -74,12 +74,12 @@ def find_pair_mapping(digits_reprs: Iterable[str]):
 
     """
     pair_map: DefaultDict[Tuple[int, int], Set[str]] = defaultdict(set)
-    for i in digits_reprs:
-        for j in digits_reprs:
-            diff = set(i) - set(j)
+    for str1 in digits_reprs:
+        for str2 in digits_reprs:
+            diff = set(str1) - set(str2)
             if len(diff) == 1:
                 sorted_tup: Tuple[int, int] = tuple( # type: ignore
-                    sorted([len(i), len(j)])
+                    sorted([len(str1), len(str2)])
                 )  # sort key tuple to avoid mismatch with originals later
                 pair_map[sorted_tup].add(list(diff)[0])  # type: ignore
     return eliminate(pair_map)
