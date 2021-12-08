@@ -66,18 +66,18 @@ def find_pair_mapping(digits_reprs: Iterable[str]):
     """
     This function will match pairs of lengths of
     representations and their differences in terms of characters.
-    The calculation is based on setA - setB, meaning it can yield a difference 1
-    even if the two strings have more than 1 different character.
-    e.g (2, 5) -> {"a"} if there are two different sets of length 6 and 7
-    respectively that have a value one. It is also possible in the case of
-    elements of the same length to yield the same 1 difference result. Then they
-    are appended to the set and will be eliminated in the next step.
+    The calculation is based on setA - setB and tries to find
+    elements that are different by one character.
+    An output map of k, v of (3, 2) - > {"a"} means there is only one combination
+    of length 3 and length 2 that is different by only one character and their
+    difference is character "a"
+    It is also possible that there are multiple combinations of the same length
+    difference with a character difference of 1 e.g (7, 6) -> {"c", "d", "e"}
 
     In the end we will take the created pairs and corresponding
     potential one char differences and eliminate one by one
     until each resulting pair can have a difference of a single character.
-    These sets will be UNIQUE.
-
+    These pairs will be UNIQUE for any potential setup.
     """
     pair_map: DefaultDict[Tuple[int, int], Set[str]] = defaultdict(set)
     for str1 in sorted(digits_reprs, key=len, reverse=True):
@@ -110,7 +110,7 @@ def eliminate(pair_map: DefaultDict[Tuple[int, int], Set[str]]):
     return map_pair_to_char
 
 
-def get_final_mapping(
+def get_letter_to_letter_mapping(
     pair_mapping_original: Dict[Tuple[int, int], str],
     pair_mapping_new: Dict[Tuple[int, int], str],
 ):
@@ -150,7 +150,7 @@ def find_new_cand(digits: Iterable[str], original_pair_mapping):
         digit_lens[len(d)].add(d)
 
     new_pair_mapping = find_pair_mapping(digits)
-    new_letter_mapping = get_final_mapping(
+    new_letter_mapping = get_letter_to_letter_mapping(
         original_pair_mapping, new_pair_mapping
     )
     new_num_mapping: Dict[str, int] = {}
@@ -167,7 +167,6 @@ if __name__ == "__main__":
     start = time()
     sample = "sample.txt"
     sample2 = "sample2.txt"
-
     input = "input.txt"
 
     inp = input
@@ -184,4 +183,6 @@ if __name__ == "__main__":
         display_outputs(dig, disp, original_pair_mapping)
         for dig, disp in zip(digits, displays)
     ]
+    end = time()
     print(f"p2: {sum(final)}")
+    print(end - start)
