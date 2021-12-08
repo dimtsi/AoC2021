@@ -2,11 +2,15 @@ from collections import Counter
 import re
 
 
-
 from collections import Counter, defaultdict
-import re
-from copy import deepcopy
-from typing import List, Tuple, Set, Dict, Iterable, MutableMapping, DefaultDict
+from typing import (
+    List,
+    Tuple,
+    Set,
+    Dict,
+    Iterable,
+    DefaultDict,
+)
 
 ORIGINAL_SEGMENTS = {
     0: "abcefg",
@@ -18,11 +22,13 @@ ORIGINAL_SEGMENTS = {
     6: "abdefg",
     7: "acf",
     8: "abcdefg",
-    9: "abcdfg"
-
+    9: "abcdfg",
 }
+
 ORIGINAL_SETS = {k: set(v) for k, v in ORIGINAL_SEGMENTS.items()}
-ORIGINAL_STR_TO_NUMS = {"".join(sorted(v)): k for k, v in ORIGINAL_SETS.items()}
+ORIGINAL_STR_TO_NUMS = {
+    "".join(sorted(v)): k for k, v in ORIGINAL_SETS.items()
+}
 
 
 ORIGINAL_LENGTHS = defaultdict(set)
@@ -70,12 +76,12 @@ def find_pair_mapping(digits_reprs: Iterable[str]):
     pair_map: DefaultDict[Tuple[int, int], Set[str]] = defaultdict(set)
     for i in digits_reprs:
         for j in digits_reprs:
-            if len(i) == len(j):
-                continue
             diff = set(i) - set(j)
             if len(diff) == 1:
-                sorted_tup: Tuple[int, int] = tuple(sorted([len(i), len(j)])) #sort key tuple to avoid mismatch with originals later
-                pair_map[sorted_tup].add(list(diff)[0]) # type: ignore
+                sorted_tup: Tuple[int, int] = tuple( # type: ignore
+                    sorted([len(i), len(j)])
+                )  # sort key tuple to avoid mismatch with originals later
+                pair_map[sorted_tup].add(list(diff)[0])  # type: ignore
     return eliminate(pair_map)
 
 
@@ -88,18 +94,20 @@ def eliminate(pair_map: DefaultDict[Tuple[int, int], Set[str]]):
             if not v or k in eliminated_tuples:
                 continue
             elif len(v) == 1:
-                val = list(v)[0]
+                val = list(v)[0] # pop unique value from set
                 eliminated.add(val)
                 eliminated_tuples.add(k)
                 map_pair_to_char[k] = val
         for key in pair_map:
-                if pair_map[key]:  # If not empty set
-                    pair_map[key] -= eliminated
+            if pair_map[key]:  # If not empty set
+                pair_map[key] -= eliminated
     return map_pair_to_char
 
 
-def get_final_mapping(pair_mapping_original: Dict[Tuple[int, int], str],
-                      pair_mapping_new:  Dict[Tuple[int, int], str]):
+def get_final_mapping(
+    pair_mapping_original: Dict[Tuple[int, int], str],
+    pair_mapping_new: Dict[Tuple[int, int], str],
+):
     new_map = {}
 
     for key in pair_mapping_original.keys():
@@ -126,7 +134,7 @@ def display_outputs(digits: Iterable[str], displayed, original_pair_mapping):
     displayed_numbers = []
     for disp in displayed:
         displayed_numbers.append(new_mapping["".join(sorted(disp))])
-    return(int("".join([str(i) for i in displayed_numbers])))
+    return int("".join([str(i) for i in displayed_numbers]))
 
 
 def find_new_cand(digits: Iterable[str], original_pair_mapping):
@@ -136,7 +144,9 @@ def find_new_cand(digits: Iterable[str], original_pair_mapping):
         digit_lens[len(d)].add(d)
 
     new_pair_mapping = find_pair_mapping(digits)
-    new_letter_mapping = get_final_mapping(original_pair_mapping, new_pair_mapping)
+    new_letter_mapping = get_final_mapping(
+        original_pair_mapping, new_pair_mapping
+    )
     new_num_mapping: Dict[str, int] = {}
 
     for digit in digits:
@@ -160,9 +170,12 @@ if __name__ == "__main__":
 
     unique_count = sum([count_unique(output) for output in displays])
     print(f"p1: {unique_count}")
-    #p2
+    # p2
     digits, displays = parse(inp)
 
     original_pair_mapping = find_pair_mapping(ORIGINAL_SEGMENTS.values())
-    final = [display_outputs(dig, disp, original_pair_mapping) for dig, disp in zip(digits, displays)]
+    final = [
+        display_outputs(dig, disp, original_pair_mapping)
+        for dig, disp in zip(digits, displays)
+    ]
     print(f"p2: {sum(final)}")
