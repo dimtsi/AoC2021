@@ -78,8 +78,10 @@ def find_pair_mapping(
     """
 
     pair_map: DefaultDict[Tuple[int, int], Set[str]] = defaultdict(set)
-    for str1 in sorted(digits_reprs, key=len, reverse=True):
-        for str2 in sorted(digits_reprs, key=len, reverse=True):
+    for str1 in digits_reprs:
+        for str2 in digits_reprs:
+            if str1 == str2:
+                continue
             diff = set(str1) - set(str2)
             if len(diff) == 1:
                 pair_map[(len(str1), len(str2))].add(list(diff)[0])  # type: ignore
@@ -99,7 +101,7 @@ def eliminate(
             if not v or k in eliminated_tuples:
                 continue
             elif len(v) == 1:
-                val = list(v)[0]  # pop unique value from set
+                val: str = list(v)[0]  # pop unique value from set
                 eliminated.add(val)
                 eliminated_tuples.add(k)
                 map_pair_to_char[k] = val
