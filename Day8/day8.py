@@ -62,15 +62,16 @@ def count_unique(outputs):
     return count
 
 
-def find_pair_mapping(digits_reprs: Iterable[str]):
+def find_pair_mapping(
+    digits_reprs: Iterable[str],
+) -> Dict[Tuple[int, int], str]:
     """
     This function will match pairs of lengths of
     representations and their differences in terms of characters.
     The calculation is based on setA - setB and tries to find
     elements that are different by one character.
     An output map of k, v of (3, 2) - > {"a"} means there is only one combination
-    of length 3 and length 2 that is different by only one character and their
-    difference is character "a"
+    of length 3 and length 2 in which the character "a" is only in the elem with length 3
     It is also possible that there are multiple combinations of the same length
     difference with a character difference of 1 e.g (7, 6) -> {"c", "d", "e"}
 
@@ -79,19 +80,23 @@ def find_pair_mapping(digits_reprs: Iterable[str]):
     until each resulting pair can have a difference of a single character.
     These pairs will be UNIQUE for any potential setup.
     """
+
     pair_map: DefaultDict[Tuple[int, int], Set[str]] = defaultdict(set)
     for str1 in sorted(digits_reprs, key=len, reverse=True):
         for str2 in sorted(digits_reprs, key=len, reverse=True):
             diff = set(str1) - set(str2)
             if len(diff) == 1:
                 pair_map[(len(str1), len(str2))].add(list(diff)[0])  # type: ignore
-    from pprint import pprint
-    pprint(pair_map)
+
     return eliminate(pair_map)
 
 
-def eliminate(pair_map: DefaultDict[Tuple[int, int], Set[str]]):
+def eliminate(
+    pair_map: DefaultDict[Tuple[int, int], Set[str]]
+) -> Dict[Tuple[int, int], str]:
+    from copy import deepcopy
 
+    original_map = deepcopy(pair_map)
     eliminated: Set[str] = set()
     eliminated_tuples = set()
     map_pair_to_char = {}
@@ -100,7 +105,7 @@ def eliminate(pair_map: DefaultDict[Tuple[int, int], Set[str]]):
             if not v or k in eliminated_tuples:
                 continue
             elif len(v) == 1:
-                val = list(v)[0] # pop unique value from set
+                val = list(v)[0]  # pop unique value from set
                 eliminated.add(val)
                 eliminated_tuples.add(k)
                 map_pair_to_char[k] = val
@@ -129,13 +134,19 @@ def get_letter_to_letter_mapping(
     return new_map
 
 
-def map_new_string_to_old_number(string, letter_mapping):
+def map_new_string_to_old_number(
+    string: str, letter_mapping: Dict[str, str]
+) -> int:
     new_repr = "".join(sorted(map(lambda x: letter_mapping[x], list(string))))
     num = ORIGINAL_STR_TO_NUMS[new_repr]
     return num
 
 
-def display_outputs(digits: Iterable[str], displayed, original_pair_mapping):
+def display_outputs(
+    digits: Iterable[str],
+    displayed: Iterable[str],
+    original_pair_mapping: Dict[Tuple[int, int], str],
+) -> int:
     new_mapping = find_new_cand(digits, original_pair_mapping)
     displayed_numbers = []
     for disp in displayed:
@@ -143,7 +154,9 @@ def display_outputs(digits: Iterable[str], displayed, original_pair_mapping):
     return int("".join([str(i) for i in displayed_numbers]))
 
 
-def find_new_cand(digits: Iterable[str], original_pair_mapping):
+def find_new_cand(
+    digits: Iterable[str], original_pair_mapping: Dict[Tuple[int, int], str]
+) -> Dict[str, int]:
 
     digit_lens = defaultdict(set)
     for d in digits:
@@ -153,7 +166,7 @@ def find_new_cand(digits: Iterable[str], original_pair_mapping):
     new_letter_mapping = get_letter_to_letter_mapping(
         original_pair_mapping, new_pair_mapping
     )
-    new_num_mapping: Dict[str, int] = {}
+    new_num_mapping: Dict[str, int] = {}  # "abcdefg" -> 8, "acfg" -> 4 etc.
 
     for digit in digits:
         new_num = map_new_string_to_old_number(digit, new_letter_mapping)
