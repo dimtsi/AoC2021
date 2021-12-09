@@ -76,8 +76,7 @@ def find_basins(matrix: List[List[int]]) -> List[Set[Tuple[int, int]]]:
     mins, min_positions = find_minimums(matrix)
 
     for min_pos in min_positions:
-        basin = set()
-        basin.add(min_pos)
+        basin = {min_pos}
         q = deque([min_pos])
         while q:
             curr = q.popleft()  # bfs
