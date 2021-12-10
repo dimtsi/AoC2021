@@ -62,7 +62,7 @@ def find_pair_mapping(
     digits_reprs: Iterable[str],
 ) -> Dict[Tuple[int, int], str]:
     """
-    This function will match pairs of lengths of
+    This function will MATCH pairs of lengths of
     representations and their differences in terms of characters.
     The calculation is based on setA - setB and tries to find
     elements that are different by one character.

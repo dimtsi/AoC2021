@@ -20,9 +20,7 @@ def parse(filename: str) -> List[List[int]]:
 
 
 def get_neighbors(
-    matrix: List[List[int]],
-    i: int,
-    j: int
+    matrix: List[List[int]], i: int, j: int
 ) -> List[Tuple[int, int]]:
     neighbors = []
 
@@ -41,9 +39,7 @@ def get_neighbors(
 
 
 def get_neighbors_and_values(
-    matrix: List[List[int]],
-    i: int,
-    j: int
+    matrix: List[List[int]], i: int, j: int
 ) -> Tuple[List[Tuple[int, int]], List[int]]:
 
     neighbors = get_neighbors(matrix, i, j)
@@ -59,7 +55,9 @@ def check_if_lower_than_neighbors(matrix: List[List[int]], i: int, j: int):
     return False
 
 
-def find_minimums(matrix: List[List[int]]):
+def find_minimums(
+    matrix: List[List[int]],
+) -> Tuple[List[int], List[Tuple[int, int]]]:
     mins = []
     min_positions = []
     for i in range(len(matrix)):
@@ -83,16 +81,16 @@ def find_basins(matrix: List[List[int]]) -> List[Set[Tuple[int, int]]]:
             curr_val = matrix[curr[0]][curr[1]]
             neighbors, neigh_vals = get_neighbors_and_values(matrix, *curr)
             for neigh, val in zip(neighbors, neigh_vals):
-                if val > curr_val and val != 9 and neigh not in basin:
+                if neigh not in basin and val > curr_val and val != 9:
                     q.append(neigh)
                     basin.add(neigh)
-        basins.append(basin)
+        basins.append(len(basin))
     return basins
 
 
 def find_topk_basins(matrix: List[List[int]], k: int):
     basins = find_basins(matrix)
-    topk = sorted(basins, key=len, reverse=True)[:k]
+    topk = sorted(basins, reverse=True)[:k]
     return topk
 
 
@@ -111,7 +109,7 @@ if __name__ == "__main__":
     print(f"p1: {minsum}")
     # p2
     topk_basins = find_topk_basins(matrix, 3)
-    prod = reduce(lambda x, y: x * y, [len(el) for el in topk_basins])
+    prod = reduce(lambda x, y: x * y, topk_basins)
     end = time()
     print(f"p2: {prod}")
     print(end - start)

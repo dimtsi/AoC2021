@@ -25,7 +25,7 @@ def find_min_position(positions: Counter, p2=False):
             if p2:
                 sum_diff += count * step_costs[abs(val - k)]
             else:
-                sum_diff += count * abs(val-k)
+                sum_diff += count * abs(val - k)
             if sum_diff > min_fuel:  # stop loop if already higher
                 break
         if sum_diff < min_fuel:
@@ -36,6 +36,7 @@ def find_min_position(positions: Counter, p2=False):
 if __name__ == "__main__":
 
     from time import time
+
     start = time()
     sample = "sample.txt"
     input = "input.txt"

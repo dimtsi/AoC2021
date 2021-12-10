@@ -5,6 +5,7 @@ from copy import deepcopy
 
 from utils import timing_val
 
+
 def parse(filename: str) -> Dict[int, int]:
     with open(filename, "r") as f:
         lines = re.findall("\d+", f.read())
@@ -37,6 +38,7 @@ def simulate(fish: Dict[int, int], days: int) -> int:
 if __name__ == "__main__":
 
     from time import time
+
     start = time()
     sample = "sample.txt"
     input = "input.txt"
@@ -50,4 +52,3 @@ if __name__ == "__main__":
     end = time()
     print(end - start)
     print(f"p1: {total_1}\np2: {total_2}")
-
