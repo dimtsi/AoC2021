@@ -25,8 +25,7 @@ def parse(filename: str) -> None:
 
 
 def find_path(curr_path: List[str], freeze: bool = False, p2: bool = False):
-    global RULES
-    global PATHS_TO_END
+
     curr_node = curr_path[-1]
 
     if (
