@@ -10,8 +10,8 @@ from typing import (
 from copy import deepcopy
 
 
-RULES = defaultdict(set)
-PATHS_TO_END = set()
+RULES: DefaultDict[str, Set[str]] = defaultdict(set)
+PATHS_TO_END: Set[Tuple[str, ...]] = set()
 
 
 def parse(filename: str) -> None:
