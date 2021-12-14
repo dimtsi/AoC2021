@@ -13,7 +13,7 @@ from copy import deepcopy
 import re
 
 
-def parse(filename: str):
+def parse(filename: str) -> Tuple[str, Dict[str, str]]:
 
     with open(filename, "r") as f:
         rules = {}
