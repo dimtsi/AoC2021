@@ -49,7 +49,7 @@ def min_cost(matrix: List[List[int]]) -> int:
 
     n_rows, n_cols = len(matrix), len(matrix[0])
     costs = [[float("inf") for _ in range(n_cols)] for _ in range(n_rows)]
-
+    predecessors = {}
     costs[0][0] = 0
     prev_answer = -1
     answer = -2
