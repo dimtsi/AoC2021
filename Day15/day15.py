@@ -42,7 +42,6 @@ def get_neighbors_vals(
     if j + 1 < num_cols:
         yield matrix[i][j + 1]
 
-    # return [matrix[i][j] for (i, j) in neighbors]
 
 
 def min_cost(matrix: List[List[int]]) -> int:
