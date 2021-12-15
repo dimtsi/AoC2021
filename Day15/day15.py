@@ -9,6 +9,7 @@ from typing import (
     DefaultDict,
     Optional,
     Union,
+    Generator,
 )
 from copy import deepcopy
 import re
@@ -26,12 +27,12 @@ def parse(filename: str) -> List[List[int]]:
 
 
 def get_neighbors_vals(
-    matrix: List[List[Union[int, float]]],
+    matrix: List[List[Union[int, float]]],  # can be float("inf")
     i: int,
     j: int,
     num_rows: int,
     num_cols: int,
-) -> Iterable[int]:
+) -> Generator[Union[int, float], None, None]:
 
     if i - 1 >= 0:
         yield matrix[i - 1][j]
@@ -43,7 +44,6 @@ def get_neighbors_vals(
         yield matrix[i][j + 1]
 
 
-
 def min_cost(matrix: List[List[int]]) -> int:
 
     n_rows, n_cols = len(matrix), len(matrix[0])
@@ -52,7 +52,7 @@ def min_cost(matrix: List[List[int]]) -> int:
 
     iters = 0
     has_changed = True
-    while has_changed:  # does not converge on first try
+    while has_changed:  # repeat till no elements change
         has_changed = False
         for i in range(n_rows):
             for j in range(n_cols):
@@ -63,10 +63,11 @@ def min_cost(matrix: List[List[int]]) -> int:
                 ):
                     if neigh_cost + matrix[i][j] < costs[i][j]:
                         costs[i][j] = neigh_cost + matrix[i][j]
-                        has_changed = True
+                        if not has_changed:
+                            has_changed = True
         iters += 1
     print(f"iters:{iters}")
-    answer = costs[n_rows - 1][n_cols - 1]
+    answer = int(costs[n_rows - 1][n_cols - 1])
     return answer
 
 
