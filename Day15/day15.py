@@ -49,10 +49,7 @@ def min_cost(matrix: List[List[int]]) -> int:
 
     n_rows, n_cols = len(matrix), len(matrix[0])
     costs = [[float("inf") for _ in range(n_cols)] for _ in range(n_rows)]
-    predecessors = {}
     costs[0][0] = 0
-    prev_answer = -1
-    answer = -2
 
     iters = 0
     has_changed = True
@@ -68,9 +65,9 @@ def min_cost(matrix: List[List[int]]) -> int:
                 if not has_changed and old_val != new_val:
                     has_changed = True
                 costs[i][j] = new_val
-        answer = costs[n_rows - 1][n_cols - 1]
         iters += 1
     print(f"iters:{iters}")
+    answer = costs[n_rows - 1][n_cols - 1]
     return answer
 
 
@@ -113,11 +110,11 @@ if __name__ == "__main__":
     from utils import submit_answer
     from aocd.exceptions import AocdError
 
-    sample = "sample2.txt"
+    sample = "sample.txt"
     input = "input.txt"
 
     sample_a_answer = 40
-    sample_b_answer = 413
+    sample_b_answer = 315
 
     answer_a, answer_b = main(sample)
     assert (
