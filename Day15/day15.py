@@ -26,8 +26,12 @@ def parse(filename: str) -> List[List[int]]:
 
 
 def get_neighbors_vals(
-    matrix: List[List[Union[int, float]]], i: int, j: int,
-num_rows: int, num_cols: int) -> Iterable[int]:
+    matrix: List[List[Union[int, float]]],
+    i: int,
+    j: int,
+    num_rows: int,
+    num_cols: int,
+) -> Iterable[int]:
 
     if i - 1 >= 0:
         yield matrix[i - 1][j]
@@ -55,7 +59,9 @@ def min_cost(matrix: List[List[int]]) -> int:
             for j in range(n_cols):
                 if i == 0 and j == 0:
                     continue
-                for neigh_cost in get_neighbors_vals(costs, i, j, n_rows, n_cols):
+                for neigh_cost in get_neighbors_vals(
+                    costs, i, j, n_rows, n_cols
+                ):
                     if neigh_cost + matrix[i][j] < costs[i][j]:
                         costs[i][j] = neigh_cost + matrix[i][j]
                         has_changed = True
