@@ -7,10 +7,12 @@ from typing import (
     Dict,
     Iterable,
     DefaultDict,
-    Optional, Union,
+    Optional,
+    Union,
 )
 from copy import deepcopy
 import re
+
 
 def parse(filename: str) -> List[List[int]]:
     matrix = []
@@ -42,8 +44,8 @@ def get_neighbors_vals(
 
     return [matrix[i][j] for (i, j) in neighbors]
 
- 
-def min_cost(matrix):
+
+def min_cost(matrix: List[List[int]]) -> int:
 
     n_rows, n_cols = len(matrix), len(matrix[0])
     costs = [[float("inf") for _ in range(n_cols)] for _ in range(n_rows)]
@@ -51,7 +53,6 @@ def min_cost(matrix):
     costs[0][0] = 0
     prev_answer = -1
     answer = -2
-
 
     iters = 0
     has_changed = True
@@ -67,15 +68,17 @@ def min_cost(matrix):
                 if not has_changed and old_val != new_val:
                     has_changed = True
                 costs[i][j] = new_val
-        answer = costs[n_rows-1][n_cols-1]
+        answer = costs[n_rows - 1][n_cols - 1]
         iters += 1
     print(f"iters:{iters}")
     return answer
 
 
-def construct_new_array(matrix):
+def construct_new_array(matrix: List[List[int]]) -> List[List[int]]:
     n_rows_old, n_cols_old = len(matrix), len(matrix[0])
-    new_matrix = [[0 for _ in range(n_rows_old * 5)] for _ in range(n_cols_old * 5)]
+    new_matrix = [
+        [0 for _ in range(n_rows_old * 5)] for _ in range(n_cols_old * 5)
+    ]
     n_rows_new, n_cols_new = len(new_matrix), len(new_matrix[0])
 
     for i in range(n_rows_new):
@@ -96,10 +99,10 @@ def main(filename: str) -> Tuple[Optional[int], Optional[int]]:
 
     matrix = parse(filename)
     answer_a = min_cost(matrix)
-    
+
     new_array = construct_new_array(matrix)
     answer_b = min_cost(new_array)
- 
+
     end = time()
     print(end - start)
     return answer_a, answer_b
