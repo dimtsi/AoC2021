@@ -47,19 +47,21 @@ def evaluate(vals: List[int], id: int) -> int:
     elif id == 3:
         return max(vals)
     elif id == 5:
-        assert(len(vals) == 2)
+        assert len(vals) == 2
         return 1 if vals[0] > vals[1] else 0
     elif id == 6:
-        assert(len(vals) == 2)
+        assert len(vals) == 2
         return 1 if vals[0] < vals[1] else 0
     elif id == 7:
-        assert(len(vals) == 2)
+        assert len(vals) == 2
         return 1 if vals[0] == vals[1] else 0
     else:
         raise Exception("Wrong id detected")
 
 
-def parse_fixed_length(s: str, start_idx: int, length: int, ver_count: int, id: int) -> Tuple[int, int, int]:
+def parse_fixed_length(
+    s: str, start_idx: int, length: int, ver_count: int, id: int
+) -> Tuple[int, int, int]:
     final_idx = start_idx + length
     vals = []
     while start_idx < final_idx:
@@ -70,7 +72,9 @@ def parse_fixed_length(s: str, start_idx: int, length: int, ver_count: int, id: 
     return ver_count, end_idx, result
 
 
-def parse_n_packets(s: str, start_idx: int, n_packets: int, ver_count: int, id: int) -> Tuple[int, int, int]:
+def parse_n_packets(
+    s: str, start_idx: int, n_packets: int, ver_count: int, id: int
+) -> Tuple[int, int, int]:
     count = 0
     vals = []
     while count < n_packets:
@@ -82,26 +86,29 @@ def parse_n_packets(s: str, start_idx: int, n_packets: int, ver_count: int, id: 
     return ver_count, end_idx, result
 
 
-def parse_operator(s: str, start_idx: int) -> Tuple[Optional[int], Optional[int]]:
+def parse_operator(
+    s: str, start_idx: int
+) -> Tuple[Optional[int], Optional[int]]:
     subpacket_len, n_subpackets = None, None
 
     if s[start_idx] == "0":
-        subpacket_len = bin_to_int(s[start_idx + 1:start_idx + 16])
+        subpacket_len = bin_to_int(s[start_idx + 1 : start_idx + 16])
     if s[start_idx] == "1":
-        n_subpackets = bin_to_int(s[start_idx + 1:start_idx + 12])
+        n_subpackets = bin_to_int(s[start_idx + 1 : start_idx + 12])
     return subpacket_len, n_subpackets
 
 
-
-def parse_literal(s: str, start_idx: int, version_sum: int)-> Tuple[int, int, int]:
+def parse_literal(
+    s: str, start_idx: int, version_sum: int
+) -> Tuple[int, int, int]:
     literal_l = []
     i = start_idx
     while True:
         if s[i] == "1":
-            literal_l.append(s[i + 1: i + 5])
+            literal_l.append(s[i + 1 : i + 5])
             i += 5
         else:
-            literal_l.append(s[i + 1: i + 5])
+            literal_l.append(s[i + 1 : i + 5])
             i += 5
             break
     print(i)
@@ -112,19 +119,27 @@ def parse_literal(s: str, start_idx: int, version_sum: int)-> Tuple[int, int, in
     return literal_int, end_idx, version_sum
 
 
-def parse_string(s: str, start_idx: int, version_sum: int) -> Tuple[int, int, int]:
-    version = bin_to_int(s[start_idx: start_idx + 3])
+def parse_string(
+    s: str, start_idx: int, version_sum: int
+) -> Tuple[int, int, int]:
+    version = bin_to_int(s[start_idx : start_idx + 3])
     version_sum += version
-    id = bin_to_int(s[start_idx + 3: start_idx + 6])
+    id = bin_to_int(s[start_idx + 3 : start_idx + 6])
 
     if id != 4:
         l, n_sub = parse_operator(s, start_idx + 6)
         if l:
-            version_sum, end_idx, val = parse_fixed_length(s, start_idx + 6 + 1 + 15, l, version_sum, id)
+            version_sum, end_idx, val = parse_fixed_length(
+                s, start_idx + 6 + 1 + 15, l, version_sum, id
+            )
         elif n_sub:
-            version_sum, end_idx, val = parse_n_packets(s, start_idx + 6 + 1 + 11, n_sub, version_sum, id)
+            version_sum, end_idx, val = parse_n_packets(
+                s, start_idx + 6 + 1 + 11, n_sub, version_sum, id
+            )
     else:
-        val, end_idx, version_sum = parse_literal(s, start_idx + 6, version_sum)
+        val, end_idx, version_sum = parse_literal(
+            s, start_idx + 6, version_sum
+        )
 
     return version_sum, end_idx, val
 
