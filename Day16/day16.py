@@ -111,7 +111,6 @@ def parse_literal(
             literal_l.append(s[i + 1 : i + 5])
             i += 5
             break
-    print(i)
     end_idx = i
 
     literal_s: str = "".join(literal_l)
