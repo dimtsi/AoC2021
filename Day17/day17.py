@@ -17,8 +17,6 @@ import sys
 
 
 class Trajectory:
-
-    
     def __init__(self, points: List[int]):
         self.points = points
         self.min_x = points[0]
@@ -84,6 +82,8 @@ def run_experiment(trajectory: Trajectory) -> Tuple[int, int]:
     counts = 0
 
     for i in range(1, trajectory.max_x + 1):
+        if i * (i + 1) // 2 <= trajectory.min_x:
+            continue
         for j in range(trajectory.min_y, 1000):
             v = [i, j]
             exp = Experiment(v, trajectory)
