@@ -84,7 +84,7 @@ def run_experiment(trajectory: Trajectory) -> Tuple[int, int]:
     for i in range(1, trajectory.max_x + 1):
         if i * (i + 1) // 2 <= trajectory.min_x:
             continue
-        for j in range(trajectory.min_y, 1000):
+        for j in range(trajectory.min_y, abs(trajectory.min_y)):
             v = [i, j]
             exp = Experiment(v, trajectory)
             success, highpoint, end_pos, end_v = exp.run()
