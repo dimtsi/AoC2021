@@ -1,5 +1,5 @@
 from collections import Counter, defaultdict, deque
-from functools import reduce, lru_cache
+from functools import lru_cache
 from typing import (
     List,
     Tuple,
@@ -15,111 +15,115 @@ from copy import deepcopy
 import re
 from math import floor, ceil
 
+
 def parse(filename: str) -> str:
     with open(filename, "r") as f:
-        strings = f.readlines()
+        strings = f.read().strip().split("\n")
 
     return strings
 
 
-class Node:
+def check_for_explode(string) -> Tuple[bool, Tuple[int, int]]:
+    opening_brackets_stack = []
+    is_explode = False
+    explode_start = None
+    explode_end = None
+    for i, char in enumerate(string):
+        if char == "[":
+            opening_brackets_stack.append(char)
+            if len(opening_brackets_stack) == 5:
+                explode_start = i
+                is_explode = True
+                continue
+        elif char == "]":
+            opening_brackets_stack.pop()
+            if is_explode:
+                explode_end = i
+                break
 
-    def __init__(self, string, left, right, parent, depth):
-        self.left, self.right = None, None
-        self.string = string
-        self.parent = parent
-        self.depth = depth
-        if string:
-            self.build_from_string(string)
-            print()
-        else:
-            self.left: Union[Node, int] = left
-            self.right: Union[Node, int] = right
-        if self.depth == 3:
-            self.check()
-        print()
+    return is_explode, (explode_start, explode_end)
 
 
-    def build_from_string(self, string):
-        print(string)
-        print(self.depth)
-        if self.parent:
-            print(self.parent.string)
-        split_idx = get_split_idx(string)
-        if not split_idx:
-            if self.parent.left == self:
-                self.parent.left = int(string)
-            else:
-                self.parent.right = int(string)
-        else:
-            left_str, right_str = string[1:split_idx], string[split_idx + 1: -1]
-            self.left = Node(left_str, None, None, self, self.depth + 1)
-            self.right = Node(right_str, None, None, self, self.depth + 1)
+def find_left_right_digits_after_explosion(string, span):
+    # Get exploding tuple values
+    left, right = re.findall("\d+", string[span[0] : span[1]])
+    new_str = ""
+    # Replace exploded with 0
+    string = string[: span[0]] + "0" + string[span[1] + 1:]
+    # string = string[:span[0]]
+    prev_num: re.Match = list(re.finditer("\d+", string[0 : span[0]]))
+    next_num: re.Match = list(re.finditer("\d+", string[span[0] + 1 :]))
 
-    def explode(self):
-        if self.parent.right == self:
-                self.parent.left = int(self.right) if not self.parent.left else self.parent.left + int(self.right)
-                self.parent.right = 0
-        else:
-            self.parent.left = 0
-            self.parent.right = int(self.left) if not self.parent.right else self.parent.right + int(
-                self.left)
-        return self.parent.check()
+    if not prev_num and next_num:
+        next_num = next_num[0]
+        new_str = (
+                string[:next_num.start() + span[0] + 1]
+                + f"{int(next_num.group()) + int(right)}"
+                + string[span[0] + 1 + next_num.end():]
+        )
+    elif prev_num and not next_num:
+        prev_num = prev_num[-1]
+        new_str +=  (string[:prev_num.start()]+ f"{int(prev_num.group()) + int(left)}"
+            + string[prev_num.end():]
+        )
 
-    def check(self):
-        if not self.parent:
-            return self
-        elif self.depth == 4:
-            self.explode()
-        elif type(self.right) == int and self.right >= 10:
-            self.right = self.split(self.right)
-            self.right.check()
-        elif type(self.left) == int and self.left >= 10:
-            self.left = self.split(self.left)
-            self.left.check()
+    else:
+        prev_num, next_num = prev_num[-1], next_num[0]
+        new_str = (
+            string[:prev_num.start()]+ f"{int(prev_num.group()) + int(left)}"
+            + string[prev_num.end(): next_num.start() + span[0] + 1]
+            + f"{int(next_num.group()) + int(right)}"
+            + string[span[0] + 1 + next_num.end():]
+        )
+    return new_str
 
-    def split(self, val: int):
-        assert type(val) == int
-        return Node(None, floor(val // 2), ceil(val // 2), self, self.depth + 1)
-#
-# def evaluate(string, depth):
-#     split_idx = get_split_idx(string)
-#     if not split_idx:
-#         return string
-#     else:
-#         string1, string2 = string[1:split_idx], string[split_idx + 1: -1]
-#         if depth == 3:
-#
-#
 
-def reduce(string, depth):
+def check_split(string):
+    nums = list(re.finditer("\d+", string))
+    for num in nums:
+        val, span = int(num.group()), num.span()
+        if val >= 10:
+            replacement = f"[{floor(val / 2)},{ceil(val / 2)}]"
+            new_string = string[:span[0]] + replacement + string[span[1]:]
+            return True, new_string
+    return False, ""
+
+
+def reduce(string):
+    is_exploding, explode_span = check_for_explode(string)
+    if is_exploding:
+        string = find_left_right_digits_after_explosion(string, explode_span)
+        string = reduce(string)
+    is_split, split_string = check_split(string)
+    if is_split:
+        string = split_string
+        string = reduce(string)
+    return string
+
+def addition(strings: List[str]):
+    first = strings.pop(0)
+
+    while strings:
+        second = strings.pop(0)
+        full = "[" + first + "," + second + "]"
+        first = reduce(full)
+    return evaluate_expression(first)
+
+
+def evaluate_expression(string):
     split_idx = get_split_idx(string)
     if not split_idx:
-        return string
-    else:
-        string1, string2 = string[1:split_idx], string[split_idx + 1: -1]
-        if depth == 3:
-            if string1.isdigit() and string2.isdigit():
-                return string
-            elif string1.isdigit() and not string2.isdigit():
-                string2_a, string2_b = reduce(string2, depth + 1)
-                return f"[{int(string1) + int(string2_a)}, {string2}]"
-            else:
-                string1_a, string1_b = reduce(string1, depth + 1)
-                return f"[{int(string1_a)}, {int(string1_b) + int(string2)}]"
-        if string1.isdigit() and int(string1) >= 10:
+        return int(string)
+    string1 = string[1:split_idx]
+    string2 = string[split_idx + 1:-1]
 
+    return 3*evaluate_expression(string1) + 2 * evaluate_expression(string2)
 
-
-
-    
-    
 
 def get_split_idx(string):
     if string.isdigit():
         return None
     opening_brackets_stack = []
-    closing_brackets_stack = []
     comma_idx = []
     for i, char in enumerate(string[1:-1], 1):
         if i == len(string) - 1:
@@ -132,30 +136,21 @@ def get_split_idx(string):
         elif char == ",":
             comma_idx.append(i)
 
-    assert(len(comma_idx) == 1)
+    assert len(comma_idx) == 1
     return comma_idx[0]
-    # raise Exception ("No split found")
+    raise Exception ("No split found")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def get_pair_with_max_addition(strings: List[str]) -> str:
+    max_score = 0
+    for s1 in strings:
+        for s2 in strings:
+            if s1 == s2:
+                continue
+            score = addition([s1, s2])
+            if score > max_score:
+                max_score = score
+    return max_score
 
 
 def main(filename: str) -> Tuple[Optional[int], Optional[int]]:
@@ -165,8 +160,13 @@ def main(filename: str) -> Tuple[Optional[int], Optional[int]]:
     answer_a, answer_b = None, None
 
     strings = parse(filename)
-    x = Node(strings[0], None, None, None, 0)
-    # answer_a = ver_count
+    addition_score = addition(strings)
+    # reduce(strings[0])
+    strings = parse(filename)
+    max_pair_score = get_pair_with_max_addition(strings)
+    # x = Node(strings[0], None, None, None, 0)
+    answer_a = addition_score
+    answer_b = max_pair_score
     # answer_b = val
     end = time()
     print(end - start)
@@ -181,8 +181,8 @@ if __name__ == "__main__":
     sample = "sample.txt"
     input = "input.txt"
 
-    sample_a_answer = 20
-    sample_b_answer = 1
+    sample_a_answer = 4140
+    sample_b_answer = 3993
 
     answer_a, answer_b = main(sample)
     assert (
