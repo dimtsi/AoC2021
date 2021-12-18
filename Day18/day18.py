@@ -92,6 +92,24 @@ class Node:
 #
 #
 
+def reduce(string, depth):
+    split_idx = get_split_idx(string)
+    if not split_idx:
+        return string
+    else:
+        string1, string2 = string[1:split_idx], string[split_idx + 1: -1]
+        if depth == 3:
+            if string1.isdigit() and string2.isdigit():
+                return string
+            elif string1.isdigit() and not string2.isdigit():
+                string2_a, string2_b = reduce(string2, depth + 1)
+                return f"[{int(string1) + int(string2_a)}, {string2}]"
+            else:
+                string1_a, string1_b = reduce(string1, depth + 1)
+                return f"[{int(string1_a)}, {int(string1_b) + int(string2)}]"
+        if string1.isdigit() and int(string1) >= 10:
+
+
 
 
     
