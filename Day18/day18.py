@@ -23,7 +23,9 @@ def parse(filename: str) -> str:
     return strings
 
 
-def check_for_explode(string) -> Tuple[bool, Tuple[int, int]]:
+def check_for_explode(
+    string,
+) -> Tuple[bool, Tuple[Optional[int], Optional[int]]]:
     opening_brackets_stack = []
     is_explode = False
     explode_start = None
@@ -44,12 +46,12 @@ def check_for_explode(string) -> Tuple[bool, Tuple[int, int]]:
     return is_explode, (explode_start, explode_end)
 
 
-def find_left_right_digits_after_explosion(string, span):
+def reformat_given_explode(string: str, span: Tuple[int, int]) -> str:
     # Get exploding tuple values
     left, right = re.findall("\d+", string[span[0] : span[1]])
     new_str = ""
     # Replace exploded with 0
-    string = string[: span[0]] + "0" + string[span[1] + 1:]
+    string = string[: span[0]] + "0" + string[span[1] + 1 :]
     # string = string[:span[0]]
     prev_num: re.Match = list(re.finditer("\d+", string[0 : span[0]]))
     next_num: re.Match = list(re.finditer("\d+", string[span[0] + 1 :]))
@@ -57,34 +59,37 @@ def find_left_right_digits_after_explosion(string, span):
     if not prev_num and next_num:
         next_num = next_num[0]
         new_str = (
-                string[:next_num.start() + span[0] + 1]
-                + f"{int(next_num.group()) + int(right)}"
-                + string[span[0] + 1 + next_num.end():]
+            string[: next_num.start() + span[0] + 1]
+            + f"{int(next_num.group()) + int(right)}"
+            + string[span[0] + 1 + next_num.end() :]
         )
     elif prev_num and not next_num:
         prev_num = prev_num[-1]
-        new_str +=  (string[:prev_num.start()]+ f"{int(prev_num.group()) + int(left)}"
-            + string[prev_num.end():]
+        new_str += (
+            string[: prev_num.start()]
+            + f"{int(prev_num.group()) + int(left)}"
+            + string[prev_num.end() :]
         )
 
     else:
         prev_num, next_num = prev_num[-1], next_num[0]
         new_str = (
-            string[:prev_num.start()]+ f"{int(prev_num.group()) + int(left)}"
-            + string[prev_num.end(): next_num.start() + span[0] + 1]
+            string[: prev_num.start()]
+            + f"{int(prev_num.group()) + int(left)}"
+            + string[prev_num.end() : next_num.start() + span[0] + 1]
             + f"{int(next_num.group()) + int(right)}"
-            + string[span[0] + 1 + next_num.end():]
+            + string[span[0] + 1 + next_num.end() :]
         )
     return new_str
 
 
-def check_split(string):
+def split_check_and_reformat(string) -> Tuple[bool, str]:
     nums = list(re.finditer("\d+", string))
     for num in nums:
         val, span = int(num.group()), num.span()
         if val >= 10:
             replacement = f"[{floor(val / 2)},{ceil(val / 2)}]"
-            new_string = string[:span[0]] + replacement + string[span[1]:]
+            new_string = string[: span[0]] + replacement + string[span[1] :]
             return True, new_string
     return False, ""
 
@@ -92,13 +97,14 @@ def check_split(string):
 def reduce(string):
     is_exploding, explode_span = check_for_explode(string)
     if is_exploding:
-        string = find_left_right_digits_after_explosion(string, explode_span)
+        string = reformat_given_explode(string, explode_span)
         string = reduce(string)
-    is_split, split_string = check_split(string)
+    is_split, split_string = split_check_and_reformat(string)
     if is_split:
         string = split_string
         string = reduce(string)
     return string
+
 
 def addition(strings: List[str]):
     first = strings.pop(0)
@@ -115,9 +121,9 @@ def evaluate_expression(string):
     if not split_idx:
         return int(string)
     string1 = string[1:split_idx]
-    string2 = string[split_idx + 1:-1]
+    string2 = string[split_idx + 1 : -1]
 
-    return 3*evaluate_expression(string1) + 2 * evaluate_expression(string2)
+    return 3 * evaluate_expression(string1) + 2 * evaluate_expression(string2)
 
 
 def get_split_idx(string):
@@ -138,10 +144,10 @@ def get_split_idx(string):
 
     assert len(comma_idx) == 1
     return comma_idx[0]
-    raise Exception ("No split found")
+    raise Exception("No split found")
 
 
-def get_pair_with_max_addition(strings: List[str]) -> str:
+def get_pair_with_max_addition(strings: List[str]) -> int:
     max_score = 0
     for s1 in strings:
         for s2 in strings:
