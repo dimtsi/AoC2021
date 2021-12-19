@@ -16,18 +16,18 @@ import re
 from math import floor, ceil
 
 
-def parse(filename: str) -> str:
+def parse(filename: str) -> List[str]:
     with open(filename, "r") as f:
         strings = f.read().strip().split("\n")
 
     return strings
 
 
-def check_for_explode(
+def is_explosive(
     string,
 ) -> Tuple[bool, Tuple[Optional[int], Optional[int]]]:
     opening_brackets_stack = []
-    is_explode = False
+    is_exploding = False
     explode_start = None
     explode_end = None
     for i, char in enumerate(string):
@@ -35,69 +35,76 @@ def check_for_explode(
             opening_brackets_stack.append(char)
             if len(opening_brackets_stack) == 5:
                 explode_start = i
-                is_explode = True
+                is_exploding = True
                 continue
         elif char == "]":
             opening_brackets_stack.pop()
-            if is_explode:
+            if is_exploding:
                 explode_end = i
                 break
 
-    return is_explode, (explode_start, explode_end)
+    return is_exploding, (explode_start, explode_end)
 
 
-def reformat_given_explode(string: str, span: Tuple[int, int]) -> str:
+def explode_and_reformat(
+    string: str, explosion_span: Tuple[int, int]
+) -> str:
     # Get exploding tuple values
-    left, right = re.findall("\d+", string[span[0] : span[1]])
+    left, right = re.findall(
+        "\d+", string[explosion_span[0]: explosion_span[1]]
+    )
     new_str = ""
     # Replace exploded with 0
-    string = string[: span[0]] + "0" + string[span[1] + 1 :]
-    # string = string[:span[0]]
-    prev_num: re.Match = list(re.finditer("\d+", string[0 : span[0]]))
-    next_num: re.Match = list(re.finditer("\d+", string[span[0] + 1 :]))
+    string = (
+        string[:explosion_span[0]] + "0" + string[explosion_span[1] + 1:]
+    )
 
-    if not prev_num and next_num:
-        next_num = next_num[0]
+    prev_nums = list(re.finditer("\d+", string[0: explosion_span[0]]))
+    next_nums = list(re.finditer("\d+", string[explosion_span[0] + 1:]))
+
+    # Replace left, right numbers in the string where the explosion pair has been
+    # replaced by 0
+    if not prev_nums and next_nums:
+        next_num = next_nums[0]
         new_str = (
-            string[: next_num.start() + span[0] + 1]
+            string[:explosion_span[0] + 1 + next_num.start()]
             + f"{int(next_num.group()) + int(right)}"
-            + string[span[0] + 1 + next_num.end() :]
+            + string[explosion_span[0] + 1 + next_num.end():]
         )
-    elif prev_num and not next_num:
-        prev_num = prev_num[-1]
+    elif prev_nums and not next_nums:
+        prev_num = prev_nums[-1]
         new_str += (
-            string[: prev_num.start()]
+            string[:prev_num.start()]
             + f"{int(prev_num.group()) + int(left)}"
-            + string[prev_num.end() :]
+            + string[prev_num.end():]
         )
 
     else:
-        prev_num, next_num = prev_num[-1], next_num[0]
+        prev_num, next_num = prev_nums[-1], next_nums[0]
         new_str = (
-            string[: prev_num.start()]
+            string[:prev_num.start()]
             + f"{int(prev_num.group()) + int(left)}"
-            + string[prev_num.end() : next_num.start() + span[0] + 1]
+            + string[prev_num.end(): next_num.start() + explosion_span[0] + 1]
             + f"{int(next_num.group()) + int(right)}"
-            + string[span[0] + 1 + next_num.end() :]
+            + string[explosion_span[0] + 1 + next_num.end():]
         )
     return new_str
 
 
-def split_check_and_reformat(string) -> Tuple[bool, str]:
-    nums = list(re.finditer("\d+", string))
-    for num in nums:
+def split_check_and_reformat(string: str) -> Tuple[bool, str]:
+    for num in re.finditer("\d+", string):
         val, span = int(num.group()), num.span()
         if val >= 10:
             replacement = f"[{floor(val / 2)},{ceil(val / 2)}]"
-            new_string = string[: span[0]] + replacement + string[span[1] :]
+            new_string = string[:span[0]] + replacement + string[span[1]:]
             return True, new_string
     return False, ""
 
 
-def reduce(string):
-    is_exploding, explode_span = check_for_explode(string)
+def reduce(string: str) -> str:
+    is_exploding, explosion_span = is_explosive(string)
     if is_exploding:
-        string = reformat_given_explode(string, explode_span)
+        string = explode_and_reformat(string, explosion_span)  # type: ignore
         string = reduce(string)
     is_split, split_string = split_check_and_reformat(string)
     if is_split:
@@ -106,7 +113,7 @@ def reduce(string):
     return string
 
 
-def addition(strings: List[str]):
+def addition(strings: List[str]) -> int:
     first = strings.pop(0)
 
     while strings:
@@ -117,20 +124,19 @@ def addition(strings: List[str]):
 
 
 def evaluate_expression(string):
-    split_idx = get_split_idx(string)
-    if not split_idx:
+    if string.isdigit():
         return int(string)
+    split_idx = get_split_idx(string)
     string1 = string[1:split_idx]
-    string2 = string[split_idx + 1 : -1]
+    string2 = string[split_idx + 1: -1]
 
     return 3 * evaluate_expression(string1) + 2 * evaluate_expression(string2)
 
 
-def get_split_idx(string):
-    if string.isdigit():
-        return None
+def get_split_idx(string) -> Optional[int]:
+
     opening_brackets_stack = []
-    comma_idx = []
+    comma_idx: List[int] = []
     for i, char in enumerate(string[1:-1], 1):
         if i == len(string) - 1:
             break
@@ -144,7 +150,6 @@ def get_split_idx(string):
 
     assert len(comma_idx) == 1
     return comma_idx[0]
-    raise Exception("No split found")
 
 
 def get_pair_with_max_addition(strings: List[str]) -> int:
@@ -164,16 +169,14 @@ def main(filename: str) -> Tuple[Optional[int], Optional[int]]:
 
     start = time()
     answer_a, answer_b = None, None
-
+    # p1
     strings = parse(filename)
     addition_score = addition(strings)
-    # reduce(strings[0])
+    # p2
     strings = parse(filename)
     max_pair_score = get_pair_with_max_addition(strings)
-    # x = Node(strings[0], None, None, None, 0)
     answer_a = addition_score
     answer_b = max_pair_score
-    # answer_b = val
     end = time()
     print(end - start)
     return answer_a, answer_b
@@ -205,6 +208,6 @@ if __name__ == "__main__":
     answer_a, answer_b = main(input)
     print(f"Your input answers: \nA: {answer_a}\nB: {answer_b}")
     try:
-        submit_answer(answer_a, "a")
+        submit_answer(answer_a, "a", 18, 2021)
     except AocdError:
-        submit_answer(answer_b, "b")
+        submit_answer(answer_b, "b", 18, 2021)
