@@ -67,16 +67,16 @@ def play_game(players: List[Player], dice_size: int) -> int:
 
 
 def play_game_p2(
-    players: List[Player], ways_to_move_k: Counter, is_moving: int = 1
+    score1, pos1, score2, pos2, ways_to_move_k: Counter, is_moving: int = 1
 ) -> Tuple[int, int]:
     global STATES
-    player1, player2 = players
-    if player1.score >= 21:
+
+    if score1 >= 21:
         return 1, 0
-    if player2.score >= 21:
+    if score2 >= 21:
         return 0, 1
 
-    state = (player1.score, player1.pos, player2.score, player2.pos, is_moving)
+    state = (score1, pos1, score2, pos2, is_moving)
 
     if state in STATES:
         return STATES[state]
@@ -84,18 +84,29 @@ def play_game_p2(
     state_wins = [0, 0]
     for move in ways_to_move_k:
         if is_moving == 1:
-            p1_copy = deepcopy(player1)
-            p1_copy.move(move)
+            new_pos_1 = (pos1 + move) % 10
+            if new_pos_1 == 0:
+                new_pos_1 = 10
+            new_score_1 = score1 + new_pos_1
+
             wins1, wins2 = play_game_p2(
-                [deepcopy(p1_copy), deepcopy(player2)],
+                new_score_1,
+                new_pos_1,
+                score2,
+                pos2,
                 ways_to_move_k,
                 is_moving=2,
             )
         else:
-            p2_copy = deepcopy(player2)
-            p2_copy.move(move)
+            new_pos_2 = (pos2 + move) % 10
+            if new_pos_2 == 0:
+                new_pos_2 = 10
+            new_score_2 = score2 + new_pos_2
             wins1, wins2 = play_game_p2(
-                [deepcopy(player1), deepcopy(p2_copy)],
+                score1,
+                pos1,
+                new_score_2,
+                new_pos_2,
                 ways_to_move_k,
                 is_moving=1,
             )
@@ -119,7 +130,14 @@ def main(filename: str) -> Tuple[Optional[int], Optional[int]]:
     STATES = {}
     players = parse(filename)
     ways_to_move_k = Counter(sum(x) for x in product(range(1, 4), repeat=3))
-    score_b = play_game_p2(players, ways_to_move_k=ways_to_move_k, is_moving=1)
+    score_b = play_game_p2(
+        players[0].score,
+        players[0].pos,
+        players[1].score,
+        players[1].pos,
+        ways_to_move_k=ways_to_move_k,
+        is_moving=1,
+    )
     x = deepcopy(STATES)
     answer_b = max(score_b)
 
