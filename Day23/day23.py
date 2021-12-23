@@ -25,14 +25,19 @@ ENTRANCE_TO_BUCKET = {v: k for k, v in BUCKET_TO_ENTRANCE.items()}
 ALL_STATES_COSTS = defaultdict(lambda: float("inf"))
 
 TARGET_POS = {"A": [11, 12], "B": [13, 14], "C": [15, 16], "D": [17, 18]}
-BUCKET_POS_TO_TARGET = {11: "A", 12: "A", 13: "B", 14: "B", 15: "C", 16: "C", 17: "D", 18: "D"}
+BUCKET_POS_TO_TARGET = {
+    11: "A",
+    12: "A",
+    13: "B",
+    14: "B",
+    15: "C",
+    16: "C",
+    17: "D",
+    18: "D",
+}
 
 
-
-
-
-
-def pprint(state):
+def pprint(state: Tuple[int, ...]):
     hallway = "".join(state[:11])
     printed = f"""
     #############
@@ -44,26 +49,24 @@ def pprint(state):
     print(printed)
 
 
-
-def move_to_empty(init, final, state):
+def move_to_empty(init: int, final: int, state: Tuple[int, ...]) -> Tuple[int, ...]:
     new_state = list(state)
     assert new_state[final] == "."
     new_state[init], new_state[final] = new_state[final], new_state[init]
     return tuple(new_state)
 
 
-def find_new_droid_positions(state, start, must_land, elem=None) -> Tuple[int, int]:
-    # right
-    # if start == 8 and elem == "A":
-    #     print()
+def find_new_droid_positions(
+    state: Tuple[int, ...], start: int, must_land: bool, elem: Optional[int] = None
+) -> List[Tuple[int, int]]:
 
     elem = elem or state[start]
     if elem not in ["A", "B", "C", "D"]:
         raise Exception("Trying to move empty point")
 
     pos_dist = []
-    x = ENTRANCE_TO_BUCKET
     dist = 0
+
     for i in range(start + 1, 11):
         dist += 1
         if state[i] != ".":  # blocked
@@ -71,7 +74,10 @@ def find_new_droid_positions(state, start, must_land, elem=None) -> Tuple[int, i
         elif i in ENTRANCE_TO_BUCKET:
             k = ENTRANCE_TO_BUCKET[i]
             if elem == ENTRANCE_TO_BUCKET[i]:
-                value1, value2 = state[TARGET_POS[elem][0]], state[TARGET_POS[elem][1]]
+                value1, value2 = (
+                    state[TARGET_POS[elem][0]],
+                    state[TARGET_POS[elem][1]],
+                )
                 if value1 != ".":
                     continue
                 elif value1 == value2 == ".":
@@ -94,7 +100,10 @@ def find_new_droid_positions(state, start, must_land, elem=None) -> Tuple[int, i
             break
         elif i in ENTRANCE_TO_BUCKET:
             if elem == ENTRANCE_TO_BUCKET[i]:
-                value1, value2 = state[TARGET_POS[elem][0]], state[TARGET_POS[elem][1]]
+                value1, value2 = (
+                    state[TARGET_POS[elem][0]],
+                    state[TARGET_POS[elem][1]],
+                )
 
                 if value1 != ".":
                     continue
@@ -112,7 +121,7 @@ def find_new_droid_positions(state, start, must_land, elem=None) -> Tuple[int, i
     return pos_dist
 
 
-def get_new_states(state):
+def get_new_states(state: Tuple[int, ...]):
     for pos in range(11, 19):  # bucket positions
 
         elem = state[pos]
@@ -130,23 +139,28 @@ def get_new_states(state):
                     state,
                     BUCKET_TO_ENTRANCE[target_elem],
                     must_land=False,
-                    elem=elem
+                    elem=elem,
                 ):
 
-                    new_state = move_to_empty(pos, new_pos, state), (dist + 2) * COSTS[elem]
+                    new_state = (
+                        move_to_empty(pos, new_pos, state),
+                        (dist + 2) * COSTS[elem],
+                    )
                     yield new_state
         else:  # top bucket
             if pos in TARGET_POS[elem]:
                 if state[pos + 1] == elem:
                     continue
             for new_pos, dist in find_new_droid_positions(
-                    state,
-                    BUCKET_TO_ENTRANCE[target_elem],
-                    must_land=False,
-                    elem=elem
+                state,
+                BUCKET_TO_ENTRANCE[target_elem],
+                must_land=False,
+                elem=elem,
             ):
-                new_state = move_to_empty(pos, new_pos, state), (dist + 1) * \
-                            COSTS[elem]
+                new_state = (
+                    move_to_empty(pos, new_pos, state),
+                    (dist + 1) * COSTS[elem],
+                )
                 yield new_state
 
     for pos in range(0, 11):  # hallway
@@ -155,13 +169,9 @@ def get_new_states(state):
         elem = state[pos]
 
         for new_pos, dist in find_new_droid_positions(
-                state,
-                pos,
-                must_land=True,
-                elem=elem
+            state, pos, must_land=True, elem=elem
         ):
-            new_state = move_to_empty(pos, new_pos, state), dist * \
-                        COSTS[elem]
+            new_state = move_to_empty(pos, new_pos, state), dist * COSTS[elem]
             yield new_state
 
 
@@ -185,40 +195,28 @@ def parse(filename: str) -> List:
     return tuple(initial_state)
 
 
-
-
-
-
 def min_cost(init_state):
     final_pos = tuple(list("...........AABBCCDD"))
-
-
-    # init_state = tuple(list("D..........AABBCC.D"))
 
     pq = [(0, init_state)]
     visited = set()
     ALL_STATES_COSTS[init_state] = 0
+
     while pq:
         cost, state = heappop(pq)
-        # neighbors =
-        # if state in visited:
-        #     continue
+
         visited.add(state)
         for new_state, val in get_new_states(state):
-            if not new_state in visited and ALL_STATES_COSTS[new_state] > cost + val:
+            if (
+                not new_state in visited
+                and ALL_STATES_COSTS[new_state] > cost + val
+            ):
                 ALL_STATES_COSTS[new_state] = cost + val
                 heappush(pq, (cost + val, new_state))
                 if new_state == final_pos:
                     pprint(new_state)
     out = ALL_STATES_COSTS[final_pos]
-    print(out)
     return out
-
-
-
-
-
-
 
 
 def main(filename: str) -> Tuple[Optional[int], Optional[int]]:
