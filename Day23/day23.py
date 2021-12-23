@@ -22,7 +22,9 @@ from itertools import permutations, product
 COSTS = {"A": 1, "B": 10, "C": 100, "D": 1000}
 BUCKET_TO_ENTRANCE = {"A": 2, "B": 4, "C": 6, "D": 8}
 ENTRANCE_TO_BUCKET = {v: k for k, v in BUCKET_TO_ENTRANCE.items()}
-ALL_STATES_COSTS: DefaultDict[Tuple[int, ...], int] = defaultdict(lambda: float("inf"))
+ALL_STATES_COSTS: DefaultDict[Tuple[int, ...], int] = defaultdict(
+    lambda: float("inf")
+)
 
 TARGET_POS = {"A": [11, 12], "B": [13, 14], "C": [15, 16], "D": [17, 18]}
 BUCKET_POS_TO_TARGET = {
@@ -49,7 +51,9 @@ def pprint(state: Tuple[int, ...]):
     print(printed)
 
 
-def move_to_empty(init: int, final: int, state: Tuple[str, ...]) -> Tuple[str, ...]:
+def move_to_empty(
+    init: int, final: int, state: Tuple[str, ...]
+) -> Tuple[str, ...]:
     new_state = list(state)
     assert new_state[final] == "."
     new_state[init], new_state[final] = new_state[final], new_state[init]
@@ -57,7 +61,10 @@ def move_to_empty(init: int, final: int, state: Tuple[str, ...]) -> Tuple[str, .
 
 
 def find_new_droid_positions(
-    state: Tuple[str, ...], start: int, must_land: bool, elem: Optional[int] = None
+    state: Tuple[str, ...],
+    start: int,
+    must_land: bool,
+    elem: Optional[int] = None,
 ) -> List[Tuple[int, int]]:
 
     elem = elem or state[start]
