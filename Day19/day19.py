@@ -132,6 +132,8 @@ def check_if_match_and_align(scanner_a: Scanner, scanner_b: Scanner):
                     common_b.update(pairs_b[dist])
                 if len(common_a) < 12 or len(common_b) < 12:
                     continue
+
+                # Freeze orientation - no more rotation exploration
                 scanner_b.beacons = rot_b
                 scanner_b.rotations = [rot_b]
                 scanner_b.distances_pairs = [
