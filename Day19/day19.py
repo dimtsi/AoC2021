@@ -175,6 +175,7 @@ def get_total_num_of_beacons(scanners: List[Scanner]) -> int:
         all_beacons |= scanner.beacons_from_origin
     return len(all_beacons)
 
+
 def get_max_manhattan(scanners: List[Scanner]) -> int:
     max_manh = 0
     for scanner_a in scanners:
