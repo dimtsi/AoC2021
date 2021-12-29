@@ -96,12 +96,12 @@ class Scanner:
         return distances, dist_to_pair
 
     def align_to_origin(self, ref_scanner, common_point_ref: Tuple[int, int, int], common_point_self: Tuple[int, int, int]):
-        origin_a = ref_scanner.loc
+        origin_ref = ref_scanner.loc
         self.loc = tuple(
             [
                 a + b - c
                 for a, b, c in zip(
-                    origin_a, common_point_ref, common_point_self
+                    origin_ref, common_point_ref, common_point_self
                 )
             ]
         )
