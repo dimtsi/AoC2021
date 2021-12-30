@@ -36,11 +36,12 @@ def parse(filename: str) -> Tuple[List, List]:
     return states, points
 
 
-def run_p1(states, limits, p2=False):
+def run_p1(
+    states: List[bool], limits: List[Tuple[int, int, int, int, int, int, int]]
+) -> int:
 
-    if not p2:
-        states = states[:20]
-        limits = limits[:20]
+    states = states[:20]
+    limits = limits[:20]
 
     on = set()
     for state, limit in zip(states, limits):
@@ -61,7 +62,7 @@ def run_p1(states, limits, p2=False):
     return len(on)
 
 
-def count_lighted(kuboids: List[Tuple[int, int, int, int, int, int]]) -> int:
+def volume(kuboids: List[Tuple[int, int, int, int, int, int]]) -> int:
     total = 0
     for kuboid in kuboids:
         dx = kuboid[1] - kuboid[0] + 1
@@ -135,7 +136,7 @@ def run_p2(
         positive_cubes.extend(new_positive)
         negative_cubes.extend(new_negative)
 
-    score = count_lighted(positive_cubes) - count_lighted(negative_cubes)
+    score = volume(positive_cubes) - volume(negative_cubes)
     return score
 
 

@@ -50,13 +50,13 @@ def play_game(players: List[Player], dice_size: int) -> int:
     i = 1 % dice_size
     while True:
         move = (i % dice_size) + (i + 1) % dice_size + (i + 2) % dice_size
-        player1.move(move)
+        player1.get_new_states(move)
         if player1.score >= 1000:
             winner = 1
             break
         i += 3
         move = (i % dice_size) + (i + 1) % dice_size + (i + 2) % dice_size
-        player2.move(move)
+        player2.get_new_states(move)
         if player2.score >= 1000:
             winner = 2
             break

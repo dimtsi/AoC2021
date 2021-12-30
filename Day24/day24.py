@@ -78,7 +78,7 @@ def solve(cmds, p2=False):
                 z_prev_set.add(z0)
                 result[z0] = tuple([w]) + result[z]
         zs = z_prev_set
-    res = ''.join(str(i) for i in result[0])
+    res = "".join(str(i) for i in result[0])
     print(res)
     return res
 
