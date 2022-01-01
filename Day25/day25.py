@@ -18,12 +18,10 @@ import numpy as np
 from itertools import combinations
 
 
-
-
 def parse(filename):
 
     with open(filename, "r") as f:
-       lines: List[str] = f.read().rstrip().splitlines()
+        lines: List[str] = f.read().rstrip().splitlines()
 
     empty = {}
     vert = defaultdict(lambda: None)
@@ -51,7 +49,7 @@ def prev(i, j, n_rows, n_cols):
 
 def pprint(horiz: Dict, vert: Dict, n_rows: int, n_cols: int):
     matrix = [["." for _ in range(n_cols)] for _ in range(n_rows)]
-    
+
     for i, j in horiz:
         if horiz[i, j]:
             matrix[i][j] = ">"
@@ -59,9 +57,9 @@ def pprint(horiz: Dict, vert: Dict, n_rows: int, n_cols: int):
     for i, j in vert:
         if vert[i, j]:
             matrix[i][j] = "v"
-            
+
     for row in matrix:
-       print("".join(row))
+        print("".join(row))
 
 
 def step(empty: Dict, horiz: Dict, vert: Dict, n_rows: int, n_cols: int):
@@ -97,7 +95,9 @@ def run_steps(empty: Dict, horiz: Dict, vert: Dict, n_rows: int, n_cols: int):
     move_count = 1
     n_steps = 0
     while move_count != 0:
-        empty, horiz, vert, move_count = step(empty, horiz, vert, n_rows, n_cols)
+        empty, horiz, vert, move_count = step(
+            empty, horiz, vert, n_rows, n_cols
+        )
         n_steps += 1
     return n_steps
 
@@ -130,12 +130,12 @@ if __name__ == "__main__":
 
     answer_a, answer_b = main(sample)
     assert (
-            answer_a == sample_a_answer
+        answer_a == sample_a_answer
     ), f"AnswerA incorrect: Actual: {answer_a}, Expected: {sample_a_answer}"
     print("sampleA correct")
     if answer_b:
         assert (
-                answer_b == sample_b_answer
+            answer_b == sample_b_answer
         ), f"AnswerB incorrect: Actual: {answer_b}, Expected: {sample_b_answer}"
         print("sampleB correct")
 
