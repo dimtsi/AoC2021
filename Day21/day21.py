@@ -50,13 +50,13 @@ def play_game(players: List[Player], dice_size: int) -> int:
     i = 1 % dice_size
     while True:
         move = (i % dice_size) + (i + 1) % dice_size + (i + 2) % dice_size
-        player1.get_new_states(move)
+        player1.move(move)
         if player1.score >= 1000:
             winner = 1
             break
         i += 3
         move = (i % dice_size) + (i + 1) % dice_size + (i + 2) % dice_size
-        player2.get_new_states(move)
+        player2.move(move)
         if player2.score >= 1000:
             winner = 2
             break
@@ -85,7 +85,7 @@ def play_game_p2(
     for move in ways_to_move_k:
         if is_moving == 1:
             p1_copy = deepcopy(player1)
-            p1_copy.get_new_states(move)
+            p1_copy.move(move)
             wins1, wins2 = play_game_p2(
                 [deepcopy(p1_copy), deepcopy(player2)],
                 ways_to_move_k,
@@ -93,7 +93,7 @@ def play_game_p2(
             )
         else:
             p2_copy = deepcopy(player2)
-            p2_copy.get_new_states(move)
+            p2_copy.move(move)
             wins1, wins2 = play_game_p2(
                 [deepcopy(player1), deepcopy(p2_copy)],
                 ways_to_move_k,
